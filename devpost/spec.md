@@ -96,7 +96,7 @@ PRD ref: `prd.md > Features and Behavior > Input validation`, `Features and Beha
 
 ## Minimal Verification Plan
 
-Use synthetic discharge summaries and questions only. The connection check confirmed a successful provider response, but not billing status or remaining quota. Mocked tests cover response parsing and source checks, and one approved live synthetic Q&A request returned a validated answer with evidence. Large-document behavior and some UI recovery cases remain to be verified. Do not issue further AI requests unless explicitly approved; never enable paid billing or use a paid fallback.
+Use synthetic discharge summaries and questions only. The connection check confirmed a successful provider response, but not billing status or remaining quota. Mocked tests cover response parsing and source checks, and one approved live synthetic Q&A request returned a validated answer with evidence. Mocked browser checks also passed for retry preservation and stale-result discard during explanation and Q&A. Large-document behavior and the final learner walkthrough remain to be verified. Do not issue further AI requests unless explicitly approved; never enable paid billing or use a paid fallback.
 
 | Case | Check | Expected result |
 | --- | --- | --- |

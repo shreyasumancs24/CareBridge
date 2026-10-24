@@ -54,7 +54,7 @@ The route does not return raw provider bodies, model output that failed validati
 
 - The 20,000-character application cap is provisional until a large synthetic document passes through the actual request, response parser, and excerpt validation.
 - Mocked tests, lint, production build, and a headless browser flow with mocked responses passed. One live synthetic Q&A request returned an accepted answer with source evidence.
-- The browser flow for recovery/retry and document edits during in-flight explanation and question requests still needs direct verification.
+- Mocked headless browser checks passed for explanation retry, failed-question retry with earlier history retained, and stale-result discard after edits during explanation and Q&A. The large-document case and final learner walkthrough remain outstanding.
 - The temporary connection-test route was removed after the live CareBridge Q&A request succeeded.
 - The final Skill Pack review, code tour/app map, demo video, and public repository checks remain outstanding.
 

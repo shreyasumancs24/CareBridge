@@ -61,7 +61,7 @@ npm run lint
 npm run build
 ```
 
-The tests use mocked provider responses. They do not prove medical correctness. One live synthetic Q&A request was separately verified; the 20,000-character case and some browser recovery cases remain to be checked.
+The tests use mocked provider responses. They do not prove medical correctness. One live synthetic Q&A request was separately verified. Mocked headless browser checks cover retry behavior and document edits during in-flight requests. The 20,000-character case and final learner walkthrough remain to be checked.
 
 ## Scope boundaries
 

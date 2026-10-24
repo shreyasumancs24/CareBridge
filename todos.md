@@ -1,6 +1,6 @@
 # CareBridge Development Checklist
 
-Updated 2026-10-25. The approved one-page CareBridge MVP is implemented. The approved scope, PRD, technical spec, and learn-mode build checklist are in `devpost/`. Mocked tests, lint, build, a mocked browser flow, and one explicitly approved live synthetic Q&A request have passed. The temporary connection-test route has been removed. Remaining work includes the large-document check, in-flight edit/retry verification, and final Skill Pack/ship tasks. The 2–4 hour estimate remains a target, not a measured result.
+Updated 2026-10-25. The approved one-page CareBridge MVP is implemented. The approved scope, PRD, technical spec, and learn-mode build checklist are in `devpost/`. Mocked tests, lint, build, headless browser checks for core flow/retry/stale-result handling, and one explicitly approved live synthetic Q&A request have passed. The temporary connection-test route has been removed. Remaining work includes the large-document check, remaining learner/final Skill Pack checks, and ship tasks. The 2–4 hour estimate remains a target, not a measured result.
 
 ## Hackathon requirements and planning
 
@@ -56,16 +56,16 @@ Updated 2026-10-25. The approved one-page CareBridge MVP is implemented. The app
 - [x] Add the synthetic verification plan to the approved spec; its implemented mocked checks are listed below.
 - [x] Add first-slice mocked tests for input validation, native response parsing, checklist excerpt checks, and generic provider failures.
 - [x] Add mocked Q&A grounding, missing/mismatched evidence, provider status, network, timeout, and malformed-response tests.
-- [ ] Add an in-flight document-edit test for both explanation and question requests.
-- [ ] Verify browser retry behavior preserves the document/question and earlier successful Q&A exchanges.
+- [x] Verify in-flight document edits during explanation and question requests with mocked browser calls; stale results were discarded and edited text/history behavior was correct.
+- [x] Verify browser retries preserve the explanation input, failed question, and earlier successful Q&A exchange; retry completed without re-entry and unsupported output failed closed.
 - [ ] Test the 20,000-character boundary with a large synthetic document and actual structured response; keep the cap provisional until it passes.
 - [x] Run mocked tests, lint, and production build after the Q&A implementation.
 - [x] Run one approved live synthetic Q&A check after fixing Gemma response parsing; HTTP 200 returned a validated answer with source evidence, with no retry or fallback.
 
 ## Security and privacy checks
 
-- [ ] Keep document contents temporary; avoid storing or logging health information.
-- [ ] Verify `.env*` secrets remain ignored and no API key is committed.
+- [x] Keep document contents temporary; source inspection found no application logging or persistent browser storage for document contents/results.
+- [x] Verify local credential files remain ignored and are not tracked; tracked credential-pattern matches were limited to `.env.example` placeholders and mock tests.
 - [x] Make the non-diagnostic and non-emergency limitations clear in the interface.
 
 ## Deployment
@@ -82,4 +82,4 @@ Updated 2026-10-25. The approved one-page CareBridge MVP is implemented. The app
 
 ## Current status and next step
 
-The `1-start`, `2-scope`, `3-prd`, and `4-spec` workflows are complete. The approved scope and PRD requirements remain unchanged; PRD verification notes now reflect current implementation status. The one-page app includes explanation, a source-traceable checklist, and document Q&A with session-only history and retry behavior. The Gemma response parser accepts both `result.response` and the documented `result.choices[0].message.content` shape while retaining strict JSON and source-evidence checks. Twenty-three mocked tests, the headless mocked browser flow, lint, and the production build pass. One approved live synthetic Q&A request returned HTTP 200 with a validated answer and source evidence; no retry or fallback was used. The temporary connection-test route was then removed, leaving only the CareBridge API route. Account billing status and remaining free quota remain unverified. The 20,000-character limit remains provisional until a large synthetic-document test passes. Do not expose or log provider bodies, and do not use paid billing or fallback.
+The `1-start`, `2-scope`, `3-prd`, and `4-spec` workflows are complete. The approved scope and PRD requirements remain unchanged; PRD verification notes now reflect current implementation status. The one-page app includes explanation, a source-traceable checklist, and document Q&A with session-only history and retry behavior. The Gemma response parser accepts both `result.response` and the documented `result.choices[0].message.content` shape while retaining strict JSON and source-evidence checks. Twenty-three mocked tests, headless mocked browser checks for core flow/retry/stale-result behavior, lint, and the production build pass. One approved live synthetic Q&A request returned HTTP 200 with a validated answer and source evidence; no retry or fallback was used for that live request. The temporary connection-test route was then removed, leaving only the CareBridge API route. Account billing status and remaining free quota remain unverified. The 20,000-character limit remains provisional until a large synthetic-document test passes. Do not expose or log provider bodies, and do not use paid billing or fallback.

@@ -12,7 +12,7 @@ Build mode: learn
 - The explanation/checklist flow, Q&A flow, and server-side Cloudflare integration are implemented.
 - Mocked tests, lint, production build, and a headless browser flow with mocked responses passed. One explicitly approved live synthetic Q&A request returned a validated answer with evidence.
 - The parser supports both `result.response` and `result.choices[0].message.content`; the source excerpt checks remain strict.
-- The milestone boxes below stay open until their full learner checks are complete. Remaining work includes direct browser verification of retry and in-flight edits, the provisional 20,000-character synthetic case, and final review/app-map/ship tasks. The temporary connection-test route was removed after the live Q&A integration passed.
+- The milestone boxes below stay open until their full learner checks are complete. Mocked browser tests now cover retry preservation and stale explanation/Q&A results when the document changes in flight. Remaining work includes the provisional 20,000-character synthetic case, remaining learner checks, and final review/app-map/ship tasks. The temporary connection-test route was removed after the live Q&A integration passed.
 - Account billing status and remaining free quota are unknown. Do not make further live requests without explicit approval or enable paid usage/fallback.
 
 ## Slices
@@ -49,7 +49,7 @@ Build mode: learn
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 1, review the explanation and checklist behavior before completing Q&A.
+- [x] Early usable behavior explored — learner confirmed the sample only fills the input, explanation results appear after submission, and empty/over-limit input is handled.
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
@@ -71,3 +71,4 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 ## Revisions
 
 - Kept additional live-model checks subject to explicit approval and no paid usage. One explicitly approved synthetic Q&A request passed; account billing status and remaining quota are still unknown.
+- Learner confirmed the slice 1 input/explanation checks. Mocked browser checks passed for retry preservation and in-flight document edits in both explanation and Q&A.

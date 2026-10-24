@@ -148,7 +148,7 @@ Before implementation is considered complete, verify these behaviors manually or
 - An API failure preserves the document/question, shows a safe error, and allows retry; no fabricated output appears.
 - Edit the document while an explanation or question request is in flight; its stale result is discarded, the edited text remains, and no old explanation, checklist, or Q&A history appears as if it matches the edited text.
 
-These remain acceptance checks. At PRD approval time, no application checks had run. Current implementation and verification status is tracked in `todos.md`; direct browser verification of retries and document edits during in-flight requests remains outstanding.
+These remain acceptance checks. At PRD approval time, no application checks had run. Current status is tracked in `todos.md`: mocked browser checks cover retry preservation and document edits during in-flight explanation and question requests; the large-document boundary and final learner walkthrough remain outstanding.
 
 ## Open Questions
 
