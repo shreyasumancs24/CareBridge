@@ -8,7 +8,6 @@ CareBridge is a single Next.js 16 App Router application using React, TypeScript
 | --- | --- |
 | `app/page.tsx` | One-page UI; keeps document text, results, Q&A history, loading, and error state in React memory. Clears results/history on document edits and ignores stale responses. |
 | `app/api/carebridge/route.ts` | Same-origin server endpoint for explanation and question requests. Validates inputs, calls Cloudflare from the server, and returns validated data or generic safe errors. |
-| `app/api/cloudflare-check/route.ts` | Temporary local-only connection test route. It is not used by the normal CareBridge flow and remains to be removed after final verification. |
 | `lib/carebridge.ts` | Shared input/schema validation, Cloudflare response parsing, exact excerpt checks, and safe result types. |
 | `tests/carebridge.test.mjs` | Mocked route/parser tests; no live provider calls. |
 | `devpost/` | Approved scope, PRD, technical spec, and build checklist. |
@@ -56,7 +55,7 @@ The route does not return raw provider bodies, model output that failed validati
 - The 20,000-character application cap is provisional until a large synthetic document passes through the actual request, response parser, and excerpt validation.
 - Mocked tests, lint, production build, and a headless browser flow with mocked responses passed. One live synthetic Q&A request returned an accepted answer with source evidence.
 - The browser flow for recovery/retry and document edits during in-flight explanation and question requests still needs direct verification.
-- The temporary `app/api/cloudflare-check/route.ts` route remains in the repository.
+- The temporary connection-test route was removed after the live CareBridge Q&A request succeeded.
 - The final Skill Pack review, code tour/app map, demo video, and public repository checks remain outstanding.
 
 ## Local operation

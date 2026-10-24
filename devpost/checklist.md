@@ -12,7 +12,7 @@ Build mode: learn
 - The explanation/checklist flow, Q&A flow, and server-side Cloudflare integration are implemented.
 - Mocked tests, lint, production build, and a headless browser flow with mocked responses passed. One explicitly approved live synthetic Q&A request returned a validated answer with evidence.
 - The parser supports both `result.response` and `result.choices[0].message.content`; the source excerpt checks remain strict.
-- The milestone boxes below stay open until their full learner checks are complete. Remaining work includes direct browser verification of retry and in-flight edits, the provisional 20,000-character synthetic case, removal of the temporary connection-test route, and final review/app-map/ship tasks.
+- The milestone boxes below stay open until their full learner checks are complete. Remaining work includes direct browser verification of retry and in-flight edits, the provisional 20,000-character synthetic case, and final review/app-map/ship tasks. The temporary connection-test route was removed after the live Q&A integration passed.
 - Account billing status and remaining free quota are unknown. Do not make further live requests without explicit approval or enable paid usage/fallback.
 
 ## Slices
@@ -42,8 +42,8 @@ Build mode: learn
   Why now: Finalize the small complete demonstration only after both explanation and Q&A work together. The 20,000-character limit remains provisional until its large synthetic request passes actual structured-response validation.
   PRD ref: `prd.md > Screens and Layout`, `Look and Feel`, `States and Boundaries`, `Non-Goals`, and `Verification Plan`
   Spec ref: `spec.md > Look and Feel`, `Where It Runs and How Someone Tries It`, `Minimal Verification Plan`, `File Structure`, and `Important Failure Modes`
-  Build: Finish accessible responsive styling and safety copy; document local setup and environment variable names without values; verify the maximum-length synthetic case only when account billing/quota conditions are confirmed safe; remove `app/api/cloudflare-check/route.ts` after the product integration is verified; do not add paid fallbacks, storage, or unrelated features.
-  Verify (mechanical): Run all available focused tests, `npm run lint`, and `npm run build`; inspect changed files for secrets and document logging; confirm the temporary route is absent and only the CareBridge endpoint remains. If the live large-document test cannot safely run, leave the cap explicitly provisional and record that limitation.
+  Build: Finish accessible responsive styling and safety copy; document local setup and environment variable names without values; verify the maximum-length synthetic case only when account billing/quota conditions are confirmed safe; remove `app/api/cloudflare-check/route.ts` after the product integration is verified; do not add paid fallbacks, storage, or unrelated features. The temporary route was removed after the approved live Q&A test succeeded.
+  Verify (mechanical): Run all available focused tests, `npm run lint`, and `npm run build`; inspect changed files for secrets and document logging; verify only the CareBridge API route remains. If the live large-document test cannot safely run, leave the cap explicitly provisional and record that limitation.
   Learner check: Start the app with the instructions in the README and walk through sample, explanation, checklist, supported/unsupported Q&A, retry, and editing during processing. Confirm no old result appears for changed text.
   Commit: `Finish and verify CareBridge MVP`
 

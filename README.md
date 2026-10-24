@@ -11,7 +11,7 @@ CareBridge is a one-page proof of concept for helping patients and caregivers un
 - Cloudflare Workers AI is called from a server-side Next.js Route Handler using `@cf/google/gemma-4-26b-a4b-it`.
 - One approved live synthetic Q&A request succeeded after correcting response parsing. This does not verify the account's billing status or remaining free quota.
 - The 20,000-character input maximum is provisional until a large synthetic-document request passes end-to-end validation.
-- `app/api/cloudflare-check/route.ts` is a temporary connection-test route. The normal app uses `app/api/carebridge/route.ts`.
+- The temporary connection-test route was removed after the live CareBridge Q&A integration succeeded. The app uses `app/api/carebridge/route.ts`.
 - Deployment is not configured. The Devpost demo video, public repository review, final skill-pack review, and app map remain future work.
 
 ## Run locally
