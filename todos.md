@@ -1,6 +1,6 @@
 # CareBridge Development Checklist
 
-Updated 2026-10-24. The approved one-page CareBridge MVP is implemented. The approved scope, PRD, technical spec, and learn-mode build checklist are in `devpost/`. Mocked tests, lint, build, a mocked browser flow, and one explicitly approved live synthetic Q&A request have passed. Remaining work includes the large-document check, in-flight edit/retry verification, temporary-route cleanup, and final Skill Pack/ship tasks. The 2–4 hour estimate remains a target, not a measured result.
+Updated 2026-10-25. The approved one-page CareBridge MVP is implemented. The approved scope, PRD, technical spec, and learn-mode build checklist are in `devpost/`. Mocked tests, lint, build, a mocked browser flow, and one explicitly approved live synthetic Q&A request have passed. The temporary connection-test route has been removed. Remaining work includes the large-document check, in-flight edit/retry verification, and final Skill Pack/ship tasks. The 2–4 hour estimate remains a target, not a measured result.
 
 ## Hackathon requirements and planning
 
