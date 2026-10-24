@@ -1,61 +1,72 @@
 # CareBridge Development Checklist
 
-This checklist reflects the repository inspected on 2026-10-22. CareBridge is currently an unmodified Next.js starter; all product work below is pending. The installed Devpost Learn Skill Pack describes a proof of concept sized for about 2–4 hours of active work. The 1-start onboarding is not complete, and the planning workflow must happen before feature development.
+Updated 2026-10-24. The approved one-page CareBridge MVP is implemented. The approved scope, PRD, technical spec, and learn-mode build checklist are in `devpost/`. Mocked tests, lint, build, a mocked browser flow, and one explicitly approved live synthetic Q&A request have passed. Remaining work includes the large-document check, in-flight edit/retry verification, temporary-route cleanup, and final Skill Pack/ship tasks. The 2–4 hour estimate remains a target, not a measured result.
 
 ## Hackathon requirements and planning
 
-- [ ] Complete the installed `1-start` onboarding and create the ignored learner profile.
-- [ ] Complete `2-scope`; draft and approve `devpost/scope.md`.
-- [ ] Complete `3-prd`; draft and approve `devpost/prd.md`.
-- [ ] Complete `4-spec`; draft and approve `devpost/spec.md`.
+- [x] Complete the installed `1-start` onboarding and create the ignored learner profile. The learner uses coding agents to understand concepts and simplify work, has planned projects before, and wants to understand the architecture and implementation well enough to explain it in interviews.
+- [x] Complete `2-scope`; draft and approve `devpost/scope.md` with a one-page MVP, explicit source traceability for checklist items, and a 2–4 hour target.
+- [x] Complete `3-prd`; review and approve `devpost/prd.md`. The numeric provider-dependent input cap and provider data-handling assumptions remain assigned to `4-spec`.
+- [x] Complete `4-spec`; learner reviewed and approved `devpost/spec.md`.
+- [x] Review and approve `devpost/checklist.md` before beginning implementation; build mode is learn.
 - [ ] Confirm the proposed MVP fits the Skill Pack's 2–4 hours of active work.
 - [ ] At shipping, prepare a short demo video and public GitHub repository; deployment is optional.
 
 ## Project setup and configuration
 
 - [x] Inspect the existing Next.js App Router starter, dependencies, and npm lockfile.
-- [ ] Resolve the Git-root layout: Git currently reports `C:/Users/hp` as the repository root, not `carebridge`.
-- [ ] After spec approval, select only dependencies needed for the agreed proof of concept.
-- [ ] Document environment variables in `.env.example` if an AI integration is approved; never add real keys.
+- [x] Resolve the Git-root layout: confirmed the project root `C:/Users/hp/carebridge` is its own Git repository; do not operate on the parent directory.
+- [x] Keep the existing Next.js stack; no additional application package was needed for the agreed proof of concept.
+- [x] Document environment variable names with placeholders in `.env.example`; never add real keys.
 
 ## UI design and implementation
 
-- [ ] Replace the starter screen with the approved responsive CareBridge document workflow.
-- [ ] Add accessible loading, empty, validation, and error states.
+- [x] Replace the starter screen with the approved responsive CareBridge document workflow.
+- [x] Add accessible loading, empty, validation, and recoverable error states.
 
 ## AI integration
 
-- [ ] Choose provider/model and a compatible SDK after checking available credentials and current documentation.
-- [ ] Implement safety-conscious explanation generation only after spec approval.
-- [ ] Validate structured output and handle provider failures without exposing secrets or document text in logs.
+- [x] Check the learner's Mistral Free plan; API keys require an upgrade, which the learner does not want.
+- [x] Research a no-cost alternative and document Cloudflare Workers AI with Google Gemma 4 26B A4B as a draft recommendation, including current Free-plan limits and data handling.
+- [x] Learner approved the Cloudflare Workers AI + Gemma 4 native REST design in `devpost/spec.md`.
+- [x] Temporary local connection test succeeded with `@cf/google/gemma-4-26b-a4b-it`; account billing status and remaining quota are unverified.
+- [ ] Before any additional live model request, verify the account's free quota and billing status; never enable paid usage or a paid fallback without explicit approval.
+- [x] Implement safety-conscious explanation and document-question generation through the server route.
+- [x] Validate structured output and handle provider failures without exposing secrets, source text, or raw provider details.
+- [ ] Remove the temporary `app/api/cloudflare-check/route.ts` after final verification and confirm the route inventory.
 
 ## Document extraction and validation
 
-- [ ] Decide whether PDF support fits the approved timebox; pasted text may be the first input path.
-- [ ] Validate document text, size, and any supported upload type.
-- [ ] If PDF is included, extract text temporarily and handle scanned or empty PDFs clearly.
+- [x] Keep PDF support out of the approved MVP; use pasted synthetic text only.
+- [x] Validate pasted document text and enforce the provisional 20,000-character limit; keep PDF support out of scope.
 
 ## Checklist generation
 
-- [ ] Extract only follow-up tasks and instructions stated in the source document.
+- [x] Extract only follow-up tasks and instructions stated in the source document, with exact supporting excerpts.
 - [ ] Allow users to mark listed tasks complete without adding medical advice.
 
 ## Document question answering
 
-- [ ] Retrieve relevant passages from the current document and ground answers in them.
-- [ ] Display supporting source text and say when the source does not answer a question.
+- [x] Ground answers in the current document and fail closed when an exact supporting excerpt is missing or mismatched.
+- [x] Display supporting source text for supported answers and clearly say when the document lacks enough information.
+- [x] Keep question history in page memory, append exchanges, preserve failed questions for retry, and clear history when the document changes.
 
 ## Testing and error handling
 
-- [ ] Add focused tests for validation, medical-safety constraints, and supported API behavior after implementation.
-- [ ] Run the available lint, type-check, and build commands and resolve verified errors.
-- [ ] No application tests or checks have been run for this documentation-only update.
+- [x] Add the synthetic verification plan to the approved spec; its implemented mocked checks are listed below.
+- [x] Add first-slice mocked tests for input validation, native response parsing, checklist excerpt checks, and generic provider failures.
+- [x] Add mocked Q&A grounding, missing/mismatched evidence, provider status, network, timeout, and malformed-response tests.
+- [ ] Add an in-flight document-edit test for both explanation and question requests.
+- [ ] Verify browser retry behavior preserves the document/question and earlier successful Q&A exchanges.
+- [ ] Test the 20,000-character boundary with a large synthetic document and actual structured response; keep the cap provisional until it passes.
+- [x] Run mocked tests, lint, and production build after the Q&A implementation.
+- [x] Run one approved live synthetic Q&A check after fixing Gemma response parsing; HTTP 200 returned a validated answer with source evidence, with no retry or fallback.
 
 ## Security and privacy checks
 
 - [ ] Keep document contents temporary; avoid storing or logging health information.
 - [ ] Verify `.env*` secrets remain ignored and no API key is committed.
-- [ ] Make the non-diagnostic and non-emergency limitations clear in the interface.
+- [x] Make the non-diagnostic and non-emergency limitations clear in the interface.
 
 ## Deployment
 
@@ -69,6 +80,6 @@ This checklist reflects the repository inspected on 2026-10-22. CareBridge is cu
 - [ ] Prepare a public GitHub repository after checking files/history for secrets and private data.
 - [ ] Complete the learner-written Devpost submission fields and exit survey.
 
-## Current blocker and next step
+## Current status and next step
 
-The Skill Pack onboarding interview is incomplete, and no approved scope, PRD, or spec exists. Next: finish `1-start`, then work through `2-scope`, `3-prd`, and `4-spec` before implementing features. The Git checkout also appears rooted at the user's home directory; determine the intended repository arrangement before any Git operation that changes files or history.
+The `1-start`, `2-scope`, `3-prd`, and `4-spec` workflows are complete. The approved scope and PRD requirements remain unchanged; PRD verification notes now reflect current implementation status. The one-page app includes explanation, a source-traceable checklist, and document Q&A with session-only history and retry behavior. The Gemma response parser accepts both `result.response` and the documented `result.choices[0].message.content` shape while retaining strict JSON and source-evidence checks. Twenty-three mocked tests, the headless mocked browser flow, lint, and the production build pass. One approved live synthetic Q&A request returned HTTP 200 with a validated answer and source evidence; no retry or fallback was used. Account billing status and remaining free quota remain unverified. The 20,000-character limit remains provisional until a large synthetic-document test passes. The temporary connection-check route remains pending cleanup. Do not expose or log provider bodies, and do not use paid billing or fallback.

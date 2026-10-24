@@ -1,102 +1,68 @@
 # CareBridge
 
-CareBridge is a planned AI-powered healthcare document simplifier. It is intended to help patients and caregivers understand discharge summaries and other healthcare instructions in plain language. **The repository is currently the unmodified Next.js starter; the CareBridge features described below are goals, not implemented functionality.**
+CareBridge is a one-page proof of concept for helping patients and caregivers understand a synthetic hospital discharge summary. It provides a plain-language explanation, a checklist based on explicit instructions, and question answering with supporting text from the supplied document.
 
-## Problem and proposed solution
+**Demo safety:** Use synthetic medical text only. CareBridge does not diagnose, prescribe, make medical decisions, or replace a healthcare professional. It is not for emergencies.
 
-Medical documents can be difficult to understand after a visit. The proposed proof of concept will explain a supplied document in plain language, surface tasks stated in that document, and answer questions using relevant source passages. It must say when the source does not provide an answer and must not invent medical instructions.
+## Current status
 
-## Planned features and current limitations
+- The approved scope, PRD, and technical spec are in `devpost/`.
+- The app has a pasted-text flow, synthetic sample, explanation, source-backed checklist, and document Q&A.
+- Cloudflare Workers AI is called from a server-side Next.js Route Handler using `@cf/google/gemma-4-26b-a4b-it`.
+- One approved live synthetic Q&A request succeeded after correcting response parsing. This does not verify the account's billing status or remaining free quota.
+- The 20,000-character input maximum is provisional until a large synthetic-document request passes end-to-end validation.
+- `app/api/cloudflare-check/route.ts` is a temporary connection-test route. The normal app uses `app/api/carebridge/route.ts`.
+- Deployment is not configured. The Devpost demo video, public repository review, final skill-pack review, and app map remain future work.
 
-- Planned: paste document text and receive a structured plain-language explanation.
-- Planned: a checklist of follow-up actions explicitly present in the document.
-- Planned: question answering grounded in relevant passages from the current document.
-- Under consideration: PDF upload and text extraction, subject to the approved timebox and technical plan.
-- Not implemented: all CareBridge product features, AI integration, PDF processing, tests, and deployment.
+## Run locally
 
-CareBridge is an educational document-understanding concept, not a diagnostic system or a clinically validated product. It is not for emergencies and does not replace advice from a healthcare professional. Users should ask their care team about unclear or conflicting instructions.
+Requirements: Node.js compatible with the installed Next.js version and npm.
 
-## Technology and architecture
+1. From the project root, install the lockfile dependencies if needed:
 
-The existing starter uses Next.js 16.4.2 App Router, React 19.3.0, TypeScript, Tailwind CSS 4, and npm. The planned architecture keeps the UI in `app/` and reusable components in `components/`; any backend endpoints would be Next.js Route Handlers under `app/api/`. No separate frontend/backend applications, database, or vector database are part of the current repository. See [architecture.md](architecture.md) for observed and proposed structure.
+   ```bash
+   npm install
+   ```
 
-No AI provider or SDK has been selected, and no API credentials have been configured. A provider choice and any new dependencies are pending the approved technical spec. Never put an API key in client-side code or commit real credentials.
+2. Add the server-only variables to the ignored project-root `.env.local` file:
 
-## Requirements
+   ```text
+   CLOUDFLARE_ACCOUNT_ID=your-account-id
+   CLOUDFLARE_API_TOKEN=your-api-token
+   ```
 
-- Node.js compatible with the installed Next.js version.
-- npm (the repository includes `package-lock.json`).
+   Do not paste real values into source files, browser code, documentation, or chat. Do not commit `.env.local`. `.env.example` contains placeholder names only.
 
-## Install and run
+3. Start the local app:
 
-From the project root (`C:\Users\hp\carebridge`), install the dependencies already recorded in the lockfile and start the development server:
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npm install
-npm run dev
-```
+4. Open <http://localhost:3000> and use the synthetic sample. Selecting the sample only fills the text area; press **Explain my instructions** to submit it.
 
-`npm install` prepares the existing dependencies; `npm run dev` starts Next.js locally. Open [http://localhost:3000](http://localhost:3000). At present, this shows the default Next.js starter screen, not a working CareBridge application.
+Live explanation and Q&A requests send the submitted synthetic text to Cloudflare Workers AI and use the account's allowance. The account's billing status and remaining free quota are not verified. Do not enable paid billing or use a paid fallback.
 
-The available scripts are `npm run dev`, `npm run build`, `npm run start`, and `npm run lint`. No separate type-check or test script is configured. These commands have not been run as part of this documentation update.
+## How the app works
 
-## Example use
+1. `app/page.tsx` keeps the document, results, and question history in page memory.
+2. The browser sends an `explain` or `ask` request to `app/api/carebridge/route.ts`.
+3. The server validates the request and sends it to Cloudflare using `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`. The token is not sent to the browser.
+4. `lib/carebridge.ts` validates the provider response, parses the model JSON, and checks checklist and answer excerpts against the submitted document.
+5. The page displays only accepted fields. Editing the document clears old results and history; stale responses are discarded.
 
-There is no working CareBridge input flow yet. Once implemented, demonstration content must be synthetic and contain no real patient information. Do not treat generated explanations as medical advice.
+For the design, privacy assumptions, verification limits, and known issues, see [architecture.md](architecture.md), [devpost/spec.md](devpost/spec.md), [todos.md](todos.md), and [errors.md](errors.md).
 
-## Privacy and safety
-
-The intended design processes documents temporarily, without storing their contents. This is a design goal and has not yet been implemented or verified. Do not upload real patient documents to this starter. The future application must avoid logging document text or secrets, preserve source warnings and uncertainty, and direct users to a healthcare professional when instructions are unclear.
-
-## Planning and status
-
-The Devpost Learn Skill Pack is installed in `agent/skills/`. Its required onboarding and planning workflow is not complete: no `devpost/learner-profile.md`, `devpost/scope.md`, `devpost/prd.md`, or `devpost/spec.md` exists. Complete `1-start`, then `2-scope`, `3-prd`, and `4-spec` before substantial feature development. The installed workflow targets a small proof of concept of about 2–4 hours of active work.
-
-Project progress is tracked in [todos.md](todos.md). The troubleshooting record is [errors.md](errors.md).
-
-## Testing
-
-No CareBridge-specific tests exist yet. After the implementation plan is approved, add focused tests for document validation, source-grounded behavior, and medical-safety requirements. Do not claim the app is safe or clinically validated based on software tests.
-
-## Deployment and hackathon submission
-
-Deployment is optional in the installed Skill Pack. Submission requires a short demo video and a public GitHub repository; the learner completes their own Devpost submission fields and exit survey. No deployment, demo, public repository, or submission link is available yet. Before publishing, check the repository contents and history for secrets and private information.
-
-## Future work
-
-Potential future work—only if it fits the agreed scope—includes PDF extraction, stronger source references, and deployment. No features or services beyond the approved proof of concept should be assumed.
-
-## Getting Started
-
-First, run the development server:
+## Checks
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm test
+npm run lint
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The tests use mocked provider responses. They do not prove medical correctness. One live synthetic Q&A request was separately verified; the 20,000-character case and some browser recovery cases remain to be checked.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scope boundaries
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The MVP uses one page and pasted synthetic text. It has no authentication, database, persistent document storage, PDF upload, or saved conversation history. See [the approved scope](devpost/scope.md) and [approved PRD](devpost/prd.md) for product requirements.

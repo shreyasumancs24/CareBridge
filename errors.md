@@ -1,15 +1,17 @@
 # Troubleshooting Log
 
-This log contains only issues observed during repository inspection and development. No application implementation errors have occurred because feature development has not started.
+This file is the index of observed project issues. The full CareBridge model-response diagnosis is in [error.md](error.md). No credentials, document text, model answer text, or raw provider body is recorded here.
 
-## 2026-10-22 — Git resolves to the home directory
+## 2026-10-22: Git initially resolved to the home directory
 
-- **Description:** Running `git rev-parse --show-toplevel` from `C:\Users\hp\carebridge` returned `C:/Users/hp`. Git status consequently listed unrelated home-directory files instead of giving a project-scoped change list.
-- **Context:** Initial repository inspection.
-- **Root cause:** The project directory has no `.git` directory and is being discovered under a repository rooted at the home directory. The intended repository arrangement is not yet known.
-- **Diagnosis:** Checked that `.git` is absent in the project root and ran `git rev-parse --show-toplevel` from the project directory.
-- **Fix:** No repository changes were made. This is unresolved; confirm or establish the intended Git repository boundary before committing or publishing.
-- **Verification:** Git still reports `C:/Users/hp` as the root; `Test-Path .git` in the project returns false.
-- **Lesson:** Git commands use the nearest parent repository. A command run in a project folder can still affect or report a parent repository if the project itself has no `.git` directory.
+- **Observed:** Early repository inspection from the project directory reported the home directory as the Git root.
+- **Current status:** Resolved. On 2026-10-24, `git rev-parse --show-toplevel` from the project returned `C:/Users/hp/carebridge`, and `.git` exists in the project root.
+- **Note:** The earlier repository arrangement is kept here as history; it is not a current blocker.
 
-No other development errors or fixes have been recorded.
+## 2026-10-24: CareBridge 502 from Gemma response-shape mismatch
+
+- **Observed:** The API returned `invalid_cloudflare_result_response_missing` for a Q&A request.
+- **Cause:** The parser required `result.response`, while the observed result used the chat-completion shape with `choices`. Cloudflare's Gemma docs show generated text at `choices[0].message.content` for that shape.
+- **Fix:** The parser now accepts either `result.response` or `result.choices[0].message.content`, then applies the same strict JSON and source-excerpt checks.
+- **Verification:** Mocked tests and a mocked browser flow passed; one explicitly approved live synthetic Q&A request returned HTTP 200 with validated evidence. No retry or fallback was used.
+- **Remaining limits:** That single live request does not verify account billing status, remaining quota, large-document behavior, or the explanation operation. See [the detailed issue record](error.md).

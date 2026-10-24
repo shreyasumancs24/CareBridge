@@ -1,49 +1,66 @@
 # CareBridge Architecture
 
-## Current state
+## Current implementation
 
-This document records the observed starter and a proposed direction for review; the CareBridge product architecture is not implemented or approved yet. The repository contains a Next.js 16.4.2 App Router starter, React 19.3.0, TypeScript, Tailwind CSS 4, and an npm lockfile. `app/page.tsx` still renders the default starter page, `app/layout.tsx` defines the root layout and default metadata, and `app/globals.css` imports Tailwind. There is no `app/api/`, `components/`, `lib/`, or tests directory at this point.
+CareBridge is a single Next.js 16 App Router application using React, TypeScript, and Tailwind CSS. The implementation follows the approved one-page pasted-text scope. It has no database, authentication, persistent browser storage, PDF extraction, or provider-side conversation history.
 
-The Git command resolves the repository root to `C:/Users/hp`, while the project files are in `C:/Users/hp/carebridge`; there is no `.git` directory in the project root. This is an environment/repository-layout issue to resolve before Git-based publishing.
+| File | Responsibility |
+| --- | --- |
+| `app/page.tsx` | One-page UI; keeps document text, results, Q&A history, loading, and error state in React memory. Clears results/history on document edits and ignores stale responses. |
+| `app/api/carebridge/route.ts` | Same-origin server endpoint for explanation and question requests. Validates inputs, calls Cloudflare from the server, and returns validated data or generic safe errors. |
+| `app/api/cloudflare-check/route.ts` | Temporary local-only connection test route. It is not used by the normal CareBridge flow and remains to be removed after final verification. |
+| `lib/carebridge.ts` | Shared input/schema validation, Cloudflare response parsing, exact excerpt checks, and safe result types. |
+| `tests/carebridge.test.mjs` | Mocked route/parser tests; no live provider calls. |
+| `devpost/` | Approved scope, PRD, technical spec, and build checklist. |
 
-## Proposed MVP shape (pending Skill Pack planning and learner approval)
+## Request and response flow
 
-Keep one Next.js application. UI belongs in `app/` and reusable UI in `components/`; backend Route Handlers, if needed, belong in `app/api/`. Put narrowly scoped shared server logic in `lib/`. Do not create separate frontend or backend projects/folders for appearance.
+```text
+Browser page
+   | POST { operation, documentText, question? }
+   v
+Next.js Route Handler (server)
+   | validate request; read secrets from server environment
+   | POST native Cloudflare Workers AI /ai/run/{model}
+   v
+Cloudflare Workers AI (Gemma 4)
+   | provider envelope containing model result
+   v
+Route Handler -> parse model JSON -> validate exact source excerpts
+   | safe result or generic error
+   v
+Browser page (current page memory only)
+```
 
-The likely core flow is: user pastes synthetic or their own document text, requests a plain-language explanation and checklist, then asks a question about that same document. The initial version should favor temporary in-memory request processing and no database, accounts, or persistent document storage. Whether PDF extraction is included remains a scope decision because it adds dependency, validation, and error-handling work.
+The browser never receives the Cloudflare API token. The server sends the current document on explanation requests and sends the current document plus one question for each Q&A request. Earlier questions remain in page memory but are not sent as provider conversation history.
 
-## Proposed responsibilities
+## Provider response handling
 
-- `app/`: App Router pages, layout, styles, and (if included) API Route Handlers.
-- `components/`: reusable accessible interface elements, if the UI requires them.
-- `lib/`: request validation, AI provider adapter, prompt/output parsing, and source-passage selection, if the approved design needs these helpers.
-- `public/`: static assets.
-- `tests/`: focused tests for safety and validation, if tests fit the selected proof-of-concept setup.
+The configured model is `@cf/google/gemma-4-26b-a4b-it`, called using the native Cloudflare REST endpoint through server-side `fetch`. The parser accepts the returned text from either `result.response` or the documented Gemma chat-completion path `result.choices[0].message.content`.
 
-These directories are recommendations, not existing files.
+After extracting a non-empty string, the server parses the model's JSON and validates the required fields. Checklist tasks are kept only when their exact `sourceText` occurs in the document and contains the displayed task. A supported Q&A answer is shown only with an exact matching evidence excerpt; otherwise the app fails closed to its insufficient-information response. Exact matching confirms that the excerpt is present, but does not prove that every model claim follows from it. CareBridge is not a medical decision-maker.
 
-## Proposed data flow and endpoints
+The route does not return raw provider bodies, model output that failed validation, document text, or secrets in errors. It uses generic recoverable messages and safe internal error codes. Avoid adding application logs of documents, questions, answers, or complete provider responses.
 
-Endpoint contracts are not approved or implemented. A simple implementation could expose an analysis Route Handler accepting validated document text and returning structured explanation sections plus document-supported tasks. A question Route Handler could accept the document text and a question, retrieve relevant text passages, and return an answer with its supporting passage or an explicit insufficient-information result. Keep request/response schemas small and validate them before calling an AI provider.
+## Data and privacy boundaries
 
-For a short document, passage selection can be simple local text chunking or keyword/relevance matching; no vector database is justified for this MVP. The browser should not receive the AI provider secret. Route Handlers should avoid logging request bodies, particularly medical text.
+- Document, explanation, and question history stay in active page memory and disappear when the page is refreshed or closed.
+- The app has no database, local storage, session storage, or server-side document persistence.
+- Submitted text leaves the app and is sent to Cloudflare Workers AI for inference. Do not say it never leaves the app.
+- The approved spec records Cloudflare's stated stateless inference and training terms, including legal/security exceptions and operational metadata. See `devpost/spec.md` for the documented assumptions and links.
+- Use synthetic discharge summaries only. Do not enable provider logging, caching, paid fallback, or extra persistence.
+- Account billing state and remaining free quota have not been verified. A single live synthetic Q&A verification succeeded, but it does not establish future no-charge access.
 
-## AI and medical safety (proposed)
+## Known verification limits
 
-Choose a provider and SDK only after the product spec and credential availability are known. Prompts should require plain-language explanations grounded in the source, preserve warnings and uncertainty, distinguish source statements from general explanations, and prohibit diagnoses, medication changes, invented doses, or unsupported follow-up instructions. Validate the response shape and handle malformed or unavailable AI output. The interface must say that CareBridge is educational, not clinically validated, not a substitute for a clinician, and not for emergencies.
+- The 20,000-character application cap is provisional until a large synthetic document passes through the actual request, response parser, and excerpt validation.
+- Mocked tests, lint, production build, and a headless browser flow with mocked responses passed. One live synthetic Q&A request returned an accepted answer with source evidence.
+- The browser flow for recovery/retry and document edits during in-flight explanation and question requests still needs direct verification.
+- The temporary `app/api/cloudflare-check/route.ts` route remains in the repository.
+- The final Skill Pack review, code tour/app map, demo video, and public repository checks remain outstanding.
 
-## Validation, errors, and privacy (proposed)
+## Local operation
 
-Validate text and upload types/size at the server boundary; if PDF is supported, reject encrypted, empty, or unreadable content with clear guidance. Process document data only for the request and avoid persistence. Do not put document content or secrets in logs or error messages. Use environment variables for any server-side API key, with placeholder names in `.env.example` and actual `.env*` files ignored by Git.
+Run `npm run dev` from the project root. The app reads `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` only on the server. Keep actual values in the ignored `.env.local`; `.env.example` contains placeholders. Run mocked tests with `npm test`, plus `npm run lint` and `npm run build`. These software checks do not establish medical correctness.
 
-## Deployment (not selected)
-
-The installed Skill Pack makes deployment optional; the required submission evidence is a short demo video and a public GitHub repository. If a hosted version is chosen later, a Next.js-compatible host such as Vercel is a candidate, with provider secrets configured in server-side environment settings. No deployment URL or account configuration exists.
-
-## Trade-offs and pending decisions
-
-- Start with pasted text if PDF extraction threatens the short timebox; decide in approved scope/spec.
-- Use document-local passage retrieval rather than a vector database to keep the proof of concept small and explainable.
-- Avoid database and authentication because the core demonstration can work within one temporary session.
-- Select an AI provider and dependencies only after checking credentials, SDK compatibility, and the approved requirements.
-- Planning workflow and MVP boundaries remain pending; no application feature code has been written.
+Product requirements remain in the approved [scope](devpost/scope.md) and [PRD](devpost/prd.md). This file describes the implementation and current verification status; it does not expand the MVP.
