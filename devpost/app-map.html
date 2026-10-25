@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>CareBridge app map</title>
+    <style>
+      :root { color-scheme: light; --ink: #173536; --muted: #526a6a; --line: #cbdcda; --wash: #f2f8f6; --accent: #146b61; --paper: #fff; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #eaf2f0; color: var(--ink); font: 16px/1.6 system-ui, sans-serif; }
+      main { width: min(900px, calc(100% - 32px)); margin: 36px auto; padding: clamp(22px, 5vw, 48px); background: var(--paper); border: 1px solid var(--line); border-radius: 20px; }
+      h1, h2 { line-height: 1.2; }
+      h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3rem); }
+      h2 { margin: 32px 0 10px; font-size: 1.35rem; }
+      p { margin: 8px 0; }
+      .intro, .note { color: var(--muted); }
+      .flow { margin: 22px 0; padding: 16px; background: var(--wash); border: 1px solid var(--line); border-radius: 14px; }
+      svg { display: block; width: 100%; height: auto; }
+      .stops { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; padding: 0; list-style: none; counter-reset: stops; }
+      .stops li { padding: 16px; border: 1px solid var(--line); border-radius: 12px; counter-increment: stops; }
+      .stops li::before { content: counter(stops) ". "; color: var(--accent); font-weight: 750; }
+      code { color: #124f49; background: var(--wash); padding: 2px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+      .takeaway { border-left: 4px solid var(--accent); padding: 12px 16px; background: var(--wash); }
+      footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .92rem; }
+      a { color: #075f57; }
+      @media (max-width: 560px) { main { margin: 12px auto; width: calc(100% - 20px); border-radius: 14px; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="intro">CareBridge · a source-grounded discharge-summary explainer</p>
+        <h1>How the app fits together</h1>
+        <p>CareBridge keeps the current document and results in page memory. The browser asks the app’s server route to explain the text; the route checks the provider response before sending a result back for display.</p>
+      </header>
+
+      <figure class="flow">
+        <svg viewBox="0 0 780 190" role="img" aria-labelledby="flow-title flow-desc">
+          <title id="flow-title">One explanation request through CareBridge</title>
+          <desc id="flow-desc">The user submits a document on the page. The page calls the CareBridge route, which validates an AI response and returns a checked explanation and source-linked tasks for display.</desc>
+          <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#146b61" /></marker></defs>
+          <g fill="#fff" stroke="#9bbab5" stroke-width="2">
+            <rect x="10" y="46" width="170" height="92" rx="14" />
+            <rect x="226" y="46" width="190" height="92" rx="14" />
+            <rect x="462" y="46" width="170" height="92" rx="14" />
+            <rect x="678" y="46" width="92" height="92" rx="14" />
+          </g>
+          <g fill="#173536" font-family="system-ui, sans-serif" font-size="15" text-anchor="middle">
+            <text x="95" y="82">Page</text><text x="95" y="106">Home · form</text>
+            <text x="321" y="82">Server route</text><text x="321" y="106">POST · validate</text>
+            <text x="547" y="82">Workers AI</text><text x="547" y="106">model response</text>
+            <text x="724" y="82">Checked</text><text x="724" y="106">results</text>
+          </g>
+          <g stroke="#146b61" stroke-width="2.5" marker-end="url(#arrow)"><path d="M184 92 H215"/><path d="M420 92 H451"/><path d="M636 92 H667"/></g>
+          <g fill="#526a6a" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle"><text x="200" y="160">JSON request</text><text x="436" y="160">server-side fetch</text><text x="652" y="160">evidence checked</text></g>
+        </svg>
+        <figcaption class="note">The provider call happens on the server, so its token stays out of browser code. The app does not save the document between page sessions.</figcaption>
+      </figure>
+
+      <h2>Reference route through the code</h2>
+      <p class="note">Use this short path to locate a future change. Search for the bold function names if your editor does not show line numbers.</p>
+      <ol class="stops">
+        <li><strong><code>app/page.tsx</code> · <code>Home</code> and <code>explainInstructions</code></strong><br>The form validates the current text, sends an <code>explain</code> request, and stores only a validated response in page state. <code>updateDocument</code> clears results when the text changes.</li>
+        <li><strong><code>app/api/carebridge/route.ts</code> · <code>POST</code></strong><br>The server checks the request, adds the model instructions, calls Cloudflare Workers AI, and returns a generic safe error if the response cannot be accepted.</li>
+        <li><strong><code>lib/carebridge.ts</code> · validation and response parsers</strong><br>This shared module enforces the text limit and checks response fields and exact source excerpts before the UI can display them.</li>
+      </ol>
+
+      <h2>To change this, start here</h2>
+      <ul>
+        <li>Input limit or shared response checks: <code>lib/carebridge.ts</code>.</li>
+        <li>Provider instructions, timeout, or safe server errors: <code>app/api/carebridge/route.ts</code>.</li>
+        <li>Page labels, results, and question history: <code>app/page.tsx</code>.</li>
+        <li>Colors and responsive layout: <code>app/globals.css</code>.</li>
+      </ul>
+
+      <h2>A practice to reuse</h2>
+      <p class="takeaway">The 20,000-character boundary was treated as a hypothesis, then checked with a synthetic document through the real CareBridge route. That produced evidence about the complete request and response path, including the app’s excerpt validation. In another project, turn an uncertain limit or integration assumption into one safe, observable end-to-end check before treating it as settled.</p>
+
+      <footer>
+        <p>Run locally with <code>npm run dev</code>, then open <code>http://localhost:3000</code>. This map describes the source snapshot at commit <code>266f993</code> plus the large-input verification recorded for this review; it can drift as code changes.</p>
+        <p>Standalone reference for offline use. No scripts, external assets, or service dependencies.</p>
+      </footer>
+    </main>
+  </body>
+</html>
