@@ -54,18 +54,18 @@ Build mode: learn
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [ ] Final review complete — verification and feedback are complete; awaiting the learner's explicit ready-to-ship confirmation.
 
 ## Code Tour and App Map
 
 - [x] Learning activity complete — guided route through `app/page.tsx` (`Home`, `explainInstructions`, `updateDocument`), `app/api/carebridge/route.ts` (`POST`), and `lib/carebridge.ts` (input/output validation and excerpt checks); learner confirmed the route was checked.
-- [ ] Optional edit and transfer reflection addressed — no optional code edit made; one transfer reflection offered and awaiting response or decline.
+- [x] Optional edit and transfer reflection addressed — no optional code edit made; learner answered the transfer reflection, stored only in the ignored learner profile.
 - [x] `devpost/app-map.html` generated from finished code, checked against current paths/symbols, and shown; includes an offline flow diagram and a project-grounded practice to reuse.
 
 Activity and evidence: Learner completed the guided explanation-request route and confirmed it was checked.
 Route and stops: `app/page.tsx` — `Home`, `explainInstructions`, `updateDocument`; `app/api/carebridge/route.ts` — `POST`; `lib/carebridge.ts` — request validation, result parsing, exact source excerpt checks.
 Edit outcome: No optional label edit made; implementation remains at the approved scope.
-Reflection: Optional transfer question offered; awaiting response or decline.
+Reflection: Answered; personal response recorded in the ignored learner profile.
 Activity mode: Guided route through the running app's implementation.
 
 ## Revisions
@@ -73,4 +73,5 @@ Activity mode: Guided route through the running app's implementation.
 - Kept live-model checks subject to explicit approval and no paid usage. The learner confirmed there is no billing before the one 20,000-character synthetic explanation check; remaining account quota was not inspected.
 - Learner confirmed the slice 1 input/explanation checks. Mocked browser checks passed for retry preservation and in-flight document edits in both explanation and Q&A.
 - Learner confirmed the final local walkthrough was working perfectly and confirmed there is no billing. A single 20,000-character synthetic explanation request to the existing CareBridge route returned HTTP 200 and a validated result with three checklist entries; every checklist excerpt was an exact substring of the submitted text. No provider response text or secret was retained in the verification output.
-- Final review fixes: none requested. Ready-to-ship confirmation remains pending. The Code Tour and App Map wrap-up is in progress.
+- Final verification: 23/23 unit and route tests passed, lint passed, the production build passed, and a browser check with a mocked API confirmed sample fill, no auto-submit, explanation rendering, and a source-traceable checklist with zero live provider requests. Source review confirmed page-memory-only document/results state, no application content logging, safety copy, and only the CareBridge API route. The learner reported no walkthrough issues.
+- Final review fixes: none requested. Explicit ready-to-ship confirmation remains pending. The optional task-completion interaction stays deferred outside the approved scope.
