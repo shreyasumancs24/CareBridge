@@ -37,7 +37,7 @@ The app has no database, authentication, or persistent document storage. Each Q&
 
 [Open the deployed CareBridge demo](https://care-bridge-git-master-ss-3ad5.vercel.app/).
 
-This is the deployed URL. Public access has not been verified; Vercel deployment protection may require configuration.
+This is the deployed URL. 
 
 ## Getting started locally
 
