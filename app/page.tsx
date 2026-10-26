@@ -268,12 +268,11 @@ export default function Home() {
             value={documentText}
             onChange={(event) => updateDocument(event.target.value)}
             placeholder="Paste the text from your discharge summary here…"
-            aria-describedby="input-help character-count input-error"
+            aria-describedby="character-count input-error"
             aria-invalid={Boolean(liveInputError)}
             spellCheck="true"
           />
           <div className="input-meta">
-            <p id="input-help">For this demo, use synthetic text only. Your text stays in this page session and is sent to Cloudflare Workers AI for processing.</p>
             <p id="character-count" className="character-count" aria-live="polite">
               {documentText.length.toLocaleString()} / {MAX_DOCUMENT_CHARACTERS.toLocaleString()} characters
             </p>
